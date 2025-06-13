@@ -13,11 +13,6 @@ $search = $_GET['search'] ?? '';
 $error = '';
 $success = '';
 
-// Enable error reporting for debugging
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && $action == 'add') {
     $name = trim($_POST['name']);
     $contact_person = trim($_POST['contact_person']);
@@ -79,6 +74,7 @@ if ($action == 'delete' && $id) {
     }
 }
 
+// Fetch supplier data for edit form
 $edit_supplier = null;
 if ($action == 'edit' && $id) {
     $query = $conn->prepare("SELECT * FROM suppliers WHERE id = ?");
@@ -90,11 +86,10 @@ if ($action == 'edit' && $id) {
     }
 }
 
+// Fetch suppliers list
 $search_query = $search ? $conn->real_escape_string($search) : '';
-$suppliers_sql = "SELECT s.*, MAX(t.created_at) AS latest_transaction 
+$suppliers_sql = "SELECT s.*, (SELECT MAX(created_at) FROM products p WHERE p.supplier_id = s.id) AS latest_product 
                  FROM suppliers s 
-                 LEFT JOIN products p ON s.id = p.supplier_id 
-                 LEFT JOIN transactions t ON p.id = t.product_id 
                  WHERE 1=1";
 if ($search_query) {
     $suppliers_sql .= " AND (s.name LIKE '%$search_query%' OR s.contact_person LIKE '%$search_query%' OR s.email LIKE '%$search_query%' OR s.phone LIKE '%$search_query%' OR s.address LIKE '%$search_query%')";
@@ -102,19 +97,30 @@ if ($search_query) {
 $suppliers_sql .= " GROUP BY s.id, s.name, s.contact_person, s.email, s.phone, s.address, s.created_at, s.updated_at";
 $suppliers_query = $conn->query($suppliers_sql);
 
-// Fetch purchase history if supplier ID is provided
+// Fetch product history for supplier
 $supplier_history = [];
+$supplier_name = 'Supplier';
 if ($id && !$action) {
+    $name_query = $conn->prepare("SELECT name FROM suppliers WHERE id = ?");
+    $name_query->bind_param("i", $id);
+    $name_query->execute();
+    $result = $name_query->get_result()->fetch_assoc();
+    if ($result) {
+        $supplier_name = $result['name'];
+    }
+
     $history_query = $conn->prepare("
-        SELECT t.id, p.name AS product_name, t.quantity, t.date, t.created_at
-        FROM transactions t
-        JOIN products p ON t.product_id = p.id
-        WHERE p.supplier_id = ?
-        ORDER BY t.created_at DESC
+        SELECT id, name, created_at
+        FROM products
+        WHERE supplier_id = ?
+        ORDER BY created_at DESC
     ");
     $history_query->bind_param("i", $id);
-    $history_query->execute();
-    $supplier_history = $history_query->get_result()->fetch_all(MYSQLI_ASSOC);
+    if (!$history_query->execute()) {
+        $error = "Gagal mengambil histori produk: " . $conn->error;
+    } else {
+        $supplier_history = $history_query->get_result()->fetch_all(MYSQLI_ASSOC);
+    }
 }
 ?>
 
@@ -144,88 +150,88 @@ if ($id && !$action) {
 <body class="bg-gray-50">
 <div class="flex h-screen">
     <!-- Sidebar -->
-<aside class="w-64 bg-white border-r px-4 py-6 flex flex-col space-y-6">
-    <div class="flex items-center space-x-3 px-2">
-        <img src="../img/Logo.png" alt="Logo" class="h-8 w-8 object-cover" />
-        <h1 class="text-xl font-semibold text-gray-800">Penko<span class="text-blue-500">.</span></h1>
-    </div>
-    <nav class="flex-1">
-        <ul class="space-y-2">
-            <li>
-                <a href="dashboard.php" class="flex items-center px-4 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
-                    <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l9-6 9 6v10a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
-                    </svg>
-                    <span class="ml-3 text-sm font-medium">Dashboard</span>
-                </a>
-            </li>
-            <li>
-                <a href="products.php" class="flex items-center px-4 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
-                    <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                    </svg>
-                    <span class="ml-3 text-sm font-medium">Produk</span>
-                </a>
-            </li>
-            <li>
-                <a href="transactions.php" class="flex items-center px-4 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
-                    <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span class="ml-3 text-sm font-medium">Transaksi</span>
-                </a>
-            </li>
-            <li>
-                <a href="categories.php" class="flex items-center px-4 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
-                    <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                    </svg>
-                    <span class="ml-3 text-sm font-medium">Kategori</span>
-                </a>
-            </li>
-            <li>
-                <a href="suppliers.php" class="flex items-center px-4 py-2 rounded-lg text-white bg-blue-500 hover:bg-blue-600 transition">
-                    <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    <span class="ml-3 text-sm font-medium">Supplier</span>
-                </a>
-            </li>
-            <li>
-                <a href="users.php" class="flex items-center px-4 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
-                    <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                    </svg>
-                    <span class="ml-3 text-sm font-medium">Pengguna</span>
-                </a>
-            </li>
-            <li>
-                <a href="requests.php" class="flex items-center px-4 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
-                    <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2m-4 0v4m0 0H7m4 0h4" />
-                    </svg>
-                    <span class="ml-3 text-sm font-medium">Permintaan</span>
-                </a>
-            </li>
-            <li>
-                <a href="reports.php" class="flex items-center px-4 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
-                    <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-6m3 6v-8m-9 8h6m-7 0H5a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v14a2 2 0 01-2 2h-7" />
-                    </svg>
-                    <span class="ml-3 text-sm font-medium">Laporan</span>
-                </a>
-            </li>
-            <li>
-                <a href="../logout.php" class="flex items-center px-4 py-2 rounded-lg text-red-500 hover:bg-red-50 hover:text-red-600 transition">
-                    <svg class="h-5 w-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h4m0 0l-3-3m3 3l-3 3m-4-3H3m9 4v5a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h5a2 2 0 012 2v1" />
-                    </svg>
-                    <span class="ml-3 text-sm font-medium">Log out</span>
-                </a>
-            </li>
-        </ul>
-    </nav>
-</aside>
+    <aside class="w-64 bg-white border-r px-4 py-6 flex flex-col space-y-6">
+        <div class="flex items-center space-x-3 px-2">
+            <img src="../img/Logo.png" alt="Logo" class="h-8 w-8 object-cover" />
+            <h1 class="text-xl font-semibold text-gray-800">Penko<span class="text-blue-500">.</span></h1>
+        </div>
+        <nav class="flex-1">
+            <ul class="space-y-2">
+                <li>
+                    <a href="dashboard.php" class="flex items-center px-4 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
+                        <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l9-6 9 6v10a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
+                        </svg>
+                        <span class="ml-3 text-sm font-medium">Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="products.php" class="flex items-center px-4 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
+                        <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                        </svg>
+                        <span class="ml-3 text-sm font-medium">Produk</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="transactions.php" class="flex items-center px-4 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
+                        <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span class="ml-3 text-sm font-medium">Transaksi</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="categories.php" class="flex items-center px-4 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
+                        <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                        <span class="ml-3 text-sm font-medium">Kategori</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="suppliers.php" class="flex items-center px-4 py-2 rounded-lg text-white bg-blue-500 hover:bg-blue-600 transition">
+                        <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <span class="ml-3 text-sm font-medium">Supplier</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="users.php" class="flex items-center px-4 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
+                        <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        <span class="ml-3 text-sm font-medium">Pengguna</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="requests.php" class="flex items-center px-4 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
+                        <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2m-4 0v4m0 0H7m4 0h4" />
+                        </svg>
+                        <span class="ml-3 text-sm font-medium">Permintaan</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="reports.php" class="flex items-center px-4 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
+                        <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-6m3 6v-8m-9 8h6m-7 0H5a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v14a2 2 0 01-2 2h-7" />
+                        </svg>
+                        <span class="ml-3 text-sm font-medium">Laporan</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../logout.php" class="flex items-center px-4 py-2 rounded-lg text-red-500 hover:bg-red-50 hover:text-red-600 transition">
+                        <svg class="h-5 w-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h4m0 0l-3-3m3 3l-3 3m-4-3H3m9 4v5a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h5a2 2 0 012 2v1" />
+                        </svg>
+                        <span class="ml-3 text-sm font-medium">Log out</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
 
     <!-- Main Content -->
     <main class="flex-1 p-6">
@@ -340,7 +346,7 @@ if ($id && !$action) {
                         <th class="text-left py-2">Telepon</th>
                         <th class="text-left py-2">Alamat</th>
                         <th class="text-left py-2">Dibuat</th>
-                        <th class="text-left py-2">Riwayat Terbaru</th>
+                        <th class="text-left py-2">Produk Terbaru</th>
                         <th class="text-left py-2">Aksi</th>
                     </tr>
                 </thead>
@@ -355,7 +361,7 @@ if ($id && !$action) {
                                 <td class="py-2"><?php echo htmlspecialchars($row['phone']); ?></td>
                                 <td class="py-2"><?php echo htmlspecialchars($row['address']); ?></td>
                                 <td class="py-2"><?php echo date('d M Y H:i', strtotime($row['created_at'])); ?></td>
-                                <td class="py-2"><?php echo $row['latest_transaction'] ? date('d M Y H:i', strtotime($row['latest_transaction'])) : '-'; ?></td>
+                                <td class="py-2"><?php echo $row['latest_product'] ? date('d M Y H:i', strtotime($row['latest_product'])) : '-'; ?></td>
                                 <td class="py-2">
                                     <a href="?action=edit&id=<?php echo $row['id']; ?>" class="text-blue-500 hover:underline">Edit</a>
                                     <a href="?action=delete&id=<?php echo $row['id']; ?>" class="text-red-500 hover:underline ml-2" onclick="return confirm('Yakin ingin menghapus supplier ini?')">Hapus</a>
@@ -372,32 +378,31 @@ if ($id && !$action) {
             </table>
         </div>
 
-        <!-- Purchase History -->
-        <?php if ($id && !$action && !empty($supplier_history)): ?>
+        <!-- Product History -->
+        <?php if ($id && !$action): ?>
         <div class="bg-white p-6 rounded-xl shadow mt-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Histori Pembelian dari <?php echo htmlspecialchars($suppliers_query->fetch_assoc()['name'] ?? 'Supplier'); ?></h3>
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Histori Produk dari <?php echo htmlspecialchars($supplier_name); ?></h3>
+            <?php if (!empty($supplier_history)): ?>
             <table class="min-w-full text-sm text-gray-600">
                 <thead>
                     <tr>
-                        <th class="text-left py-2">ID Transaksi</th>
+                        <th class="text-left py-2">ID Produk</th>
                         <th class="text-left py-2">Nama Produk</th>
-                        <th class="text-left py-2">Jumlah</th>
-                        <th class="text-left py-2">Tanggal Transaksi</th>
+                        <th class="text-left py-2">Tanggal Ditambahkan</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($supplier_history as $row): ?>
-                        <tr class="border-t">
-                            <td class="py-2">#<?php echo $row['id']; ?></td>
-                            <td class="py-2"><?php echo htmlspecialchars($row['product_name']); ?></td>
-                            <td class="py-2"><?php echo number_format($row['quantity'], 0, ',', '.'); ?></td>
-                            <td class="py-2"><?php echo date('d M Y, H:i', strtotime($row['created_at'])); ?></td>
-                        </tr>
+                    <tr class="border-t">
+                        <td class="py-2">#<?php echo $row['id']; ?></td>
+                        <td class="py-2"><?php echo htmlspecialchars($row['name']); ?></td>
+                        <td class="py-2"><?php echo date('d M Y, H:i', strtotime($row['created_at'])); ?></td>
+                    </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
-            <?php if (empty($supplier_history)): ?>
-                <p class="text-gray-500 text-center mt-4">Tidak ada histori pembelian untuk supplier ini.</p>
+            <?php else: ?>
+                <p class="text-gray-500 text-center mt-4">Tidak ada produk terkait supplier ini.</p>
             <?php endif; ?>
         </div>
         <?php endif; ?>
