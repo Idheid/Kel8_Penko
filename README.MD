@@ -6,10 +6,10 @@ Penko adalah aplikasi web yang dirancang untuk mengelola inventaris Alat Tulis K
 Sistem ini bertujuan menciptakan alur pengajuan dan distribusi ATK yang tertib, transparan, dan terdokumentasi dengan baik. Dengan Penko, proses pencatatan keluar-masuk barang menjadi lebih efisien, mudah diawasi, dan meminimalkan kesalahan dalam pendistribusian.
 
 ## Fitur Utama
-- **Manajemen Inventaris** (Admin):: Tambah, edit, dan hapus data alat tulis.
-- **Pelacakan Stok**(Admin): Pantau jumlah stok secara real-time.
-- **Pengelolaan Permintaan**(Admin & Staff): Staff mengajukan permintaan ATK, admin menyetujui atau menolaknya.
-- **Laporan Stok**(Admin):: Hasilkan laporan stok dan riwayat penggunaan.
+- **Manajemen Inventaris** (Admin): Tambah, edit, dan hapus data alat tulis.
+- **Pelacakan Stok** (Admin): Pantau jumlah stok secara real-time.
+- **Pengelolaan Permintaan** (Admin & Staff): Staff mengajukan permintaan ATK, admin menyetujui atau menolaknya.
+- **Laporan Stok** (Admin):: Hasilkan laporan stok dan riwayat penggunaan.
 - **Hak Akses Berbasis Peran**: Admin memiliki akses penuh, sedangkan staff hanya dapat melihat daftar barang dan mengajukan permintaan.
 - **Antarmuka Pengguna**: Desain responsif untuk kemudahan penggunaan.
 
@@ -20,31 +20,6 @@ Sistem ini bertujuan menciptakan alur pengajuan dan distribusi ATK yang tertib, 
 - **Server**: Apache
 - **Lainnya**: Bootstrap (untuk styling), jQuery (untuk interaktivitas)
 
-## Struktur Direktori
-```
-Kel8_Penko/
-├── assets/
-│   ├── css/
-│   │   └── style.css
-│   ├── js/
-│   │   └── script.js
-│   └── images/
-├── config/
-│   └── db_connect.php
-├── includes/
-│   ├── header.php
-│   └── footer.php
-├── pages/
-│   ├── dashboard.php
-│   ├── inventory.php
-│   ├── add_item.php
-│   ├── edit_item.php
-│   └── report.php
-├── .gitignore
-├── index.php
-├── README.md
-└── LICENSE
-```
 
 ## Cara Instalasi
 1. **Kloning Repositori**:
