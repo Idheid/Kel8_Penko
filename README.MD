@@ -45,7 +45,7 @@ Sistem ini bertujuan menciptakan alur pengajuan dan distribusi ATK yang tertib, 
 1. **Akses Aplikasi**:
 
    - Buka browser dan kunjungi `https://localhost`.
-   - Login menggunakan kredensial admin (default: username `admin`, password `admin123`) atau akun staff.
+   - Login menggunakan kredensial admin (default: username `admin`, password `penko123`) atau akun staff (default: username `staff1` atau `staff2`, password `penko123`).
 
 2. **Sebagai Admin**:
 
