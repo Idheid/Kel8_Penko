@@ -69,13 +69,11 @@ Kel8_Penko/
 4. Pantau stok melalui halaman "Dashboard".
 5. Hasilkan laporan stok melalui menu "Laporan".
 
-## Kontribusi
-Kami menyambut kontribusi! Untuk berkontribusi:
-1. Fork repositori ini.
-2. Buat branch baru (`git checkout -b fitur-baru`).
-3. Commit perubahan Anda (`git commit -m 'Menambahkan fitur X'`).
-4. Push ke branch Anda (`git push origin fitur-baru`).
-5. Buat Pull Request di GitHub.
+## Kontributor
+1. [Adrianne Julian Claresta](https://github.com/Idheid)
+2. [Dymaz Satya Putra](https://github.com/DYmazeh)
+3. [Sulthon Aris Setiawan](https://github.com/sulthonarissetiawan)
+4. [Rizqi Ananda Pratama](https://github.com/rizqianandapratam)
 
 ## Lisensi
 Proyek ini dilisensikan di bawah MIT License. Lihat file `LICENSE` untuk detail.
