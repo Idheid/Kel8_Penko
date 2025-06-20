@@ -14,7 +14,7 @@ Sistem ini bertujuan menciptakan alur pengajuan dan distribusi ATK yang tertib, 
 - **Antarmuka Pengguna**: Desain responsif untuk kemudahan penggunaan.
 
 ## Teknologi yang Digunakan
-- **Frontend**: HTML, CSS, JavaScript
+- **Frontend**: HTML, CSS
 - **Backend**: PHP
 - **Database**: MySQL
 - **Server**: Apache
