@@ -1,13 +1,16 @@
-# Kel8_Penko - Sistem Pengelolaan Inventaris Alat Tulis Kantor
+# Penko - Sistem Pengelolaan Inventaris Alat Tulis Kantor
 
 ## Deskripsi Proyek
-Kel8_Penko adalah aplikasi web untuk mengelola inventaris alat tulis kantor di sebuah perusahaan. Sistem ini memungkinkan pencatatan, pelacakan, dan pengelolaan stok alat tulis seperti pena, kertas, stapler, dan lainnya. Tujuannya adalah untuk memastikan ketersediaan barang, mencegah kekurangan stok, dan mendukung proses pengadaan yang efisien.
+Penko adalah aplikasi web yang dirancang untuk mengelola inventaris Alat Tulis Kantor (ATK) di lingkungan kerja. Aplikasi ini mendukung dua peran utama: Admin dan Staff. Admin bertanggung jawab mengelola data barang masuk dan keluar, memastikan stok tercatat dengan baik, serta memproses permintaan ATK dari staff. Staff dapat mengajukan permintaan ATK untuk mendukung kebutuhan kerja mereka, yang kemudian disetujui atau ditolak oleh admin berdasarkan ketersediaan dan kebijakan.
+
+Sistem ini bertujuan menciptakan alur pengajuan dan distribusi ATK yang tertib, transparan, dan terdokumentasi dengan baik. Dengan Penko, proses pencatatan keluar-masuk barang menjadi lebih efisien, mudah diawasi, dan meminimalkan kesalahan dalam pendistribusian.
 
 ## Fitur Utama
-- **Manajemen Inventaris**: Tambah, edit, dan hapus data alat tulis.
-- **Pelacakan Stok**: Pantau jumlah stok secara real-time.
-- **Laporan Stok**: Hasilkan laporan stok dan riwayat penggunaan.
-- **Pengelolaan Pengadaan**: Rencanakan pembelian berdasarkan kebutuhan.
+- **Manajemen Inventaris** (Admin):: Tambah, edit, dan hapus data alat tulis.
+- **Pelacakan Stok**(Admin): Pantau jumlah stok secara real-time.
+- **Pengelolaan Permintaan**(Admin & Staff): Staff mengajukan permintaan ATK, admin menyetujui atau menolaknya.
+- **Laporan Stok**(Admin):: Hasilkan laporan stok dan riwayat penggunaan.
+- **Hak Akses Berbasis Peran**: Admin memiliki akses penuh, sedangkan staff hanya dapat melihat daftar barang dan mengajukan permintaan.
 - **Antarmuka Pengguna**: Desain responsif untuk kemudahan penggunaan.
 
 ## Teknologi yang Digunakan
@@ -63,23 +66,46 @@ Kel8_Penko/
    - Buka browser dan kunjungi `http://localhost/Kel8_Penko`.
 
 ## Cara Penggunaan
-1. Buka aplikasi melalui browser di `http://localhost/Kel8_Penko`.
-2. Login sebagai admin (gunakan kredensial default jika ada, atau buat akun baru).
-3. Tambahkan alat tulis baru melalui menu "Tambah Inventaris".
-4. Pantau stok melalui halaman "Dashboard".
-5. Hasilkan laporan stok melalui menu "Laporan".
+
+1. **Akses Aplikasi**:
+
+   - Buka browser dan kunjungi `https://localhost`.
+   - Login menggunakan kredensial admin (default: username `admin`, password `admin123`) atau akun staff.
+
+2. **Sebagai Admin**:
+
+   - **Kelola Inventaris**:
+     - Buka menu "Inventaris" untuk menambah barang baru (misalnya, pena, kertas).
+     - Edit atau hapus data barang jika diperlukan.
+     - Perbarui jumlah stok setelah barang masuk atau keluar.
+   - **Proses Permintaan**:
+     - Buka menu "Permintaan" untuk melihat daftar permintaan dari staff.
+     - Tinjau detail permintaan (nama barang, jumlah, keperluan).
+     - Setujui atau tolak permintaan berdasarkan ketersediaan stok.
+   - **Lihat Laporan**:
+     - Akses menu "Laporan" untuk menghasilkan laporan stok atau riwayat permintaan.
+     - Unduh laporan dalam format PDF atau Excel (jika tersedia).
+
+3. **Sebagai Staff**:
+
+   - **Lihat Daftar Barang**:
+     - Buka menu "Daftar Barang" untuk melihat ATK yang tersedia.
+   - **Ajukan Permintaan**:
+     - Buka menu "Buat Permintaan".
+     - Pilih barang, masukkan jumlah, dan jelaskan keperluan.
+     - Kirim permintaan untuk ditinjau admin.
+   - **Cek Status Permintaan**:
+     - Buka menu "Status Permintaan" untuk melihat apakah permintaan disetujui, ditolak, atau masih ditinjau.
+
+4. **Tips Penggunaan**:
+
+   - Pastikan login dengan peran yang sesuai (admin/staff).
+   - Periksa stok sebelum mengajukan permintaan (untuk staff).
+   - Admin disarankan memperbarui stok secara berkala untuk menjaga akurasi data.
+   - Gunakan fitur laporan untuk analisis kebutuhan ATK bulanan.
 
 ## Kontributor
 1. [Adrianne Julian Claresta](https://github.com/Idheid)
 2. [Dymaz Satya Putra](https://github.com/DYmazeh)
 3. [Sulthon Aris Setiawan](https://github.com/sulthonarissetiawan)
 4. [Rizqi Ananda Pratama](https://github.com/rizqianandapratam)
-
-## Lisensi
-Proyek ini dilisensikan di bawah MIT License. Lihat file `LICENSE` untuk detail.
-
-## Kontak
-Untuk pertanyaan atau dukungan, buka issue di repositori ini atau hubungi kami melalui email.
-
----
-**Repositori GitHub**: [https://github.com/Idheid/Kel8_Penko](https://github.com/Idheid/Kel8_Penko)
