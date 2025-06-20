@@ -18,7 +18,7 @@ Sistem ini bertujuan menciptakan alur pengajuan dan distribusi ATK yang tertib, 
 - **Backend**: PHP
 - **Database**: MySQL
 - **Server**: Apache
-- **Lainnya**: Bootstrap (untuk styling)
+- **Lainnya**: Tailwind (untuk styling)
 
 
 ## Cara Instalasi
