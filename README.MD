@@ -59,7 +59,6 @@ Sistem ini bertujuan menciptakan alur pengajuan dan distribusi ATK yang tertib, 
      - Setujui atau tolak permintaan berdasarkan ketersediaan stok.
    - **Lihat Laporan**:
      - Akses menu "Laporan" untuk menghasilkan laporan stok atau riwayat permintaan.
-     - Unduh laporan dalam format PDF atau Excel (jika tersedia).
 
 3. **Sebagai Staff**:
 
