@@ -21,30 +21,11 @@ Sistem ini bertujuan menciptakan alur pengajuan dan distribusi ATK yang tertib, 
 - **Lainnya**: Tailwind (untuk styling)
 
 
-## Cara Instalasi
-1. **Kloning Repositori**:
-   ```bash
-   git clone https://github.com/Idheid/Kel8_Penko.git
-   ```
-2. **Masuk ke Direktori Proyek**:
-   ```bash
-   cd Kel8_Penko
-   ```
-3. **Konfigurasi Database**:
-   - Buat database MySQL bernama `penko_inventory`.
-   - Impor skema database dari file `database.sql` (jika ada).
-   - Sesuaikan pengaturan koneksi database di `config/db_connect.php`.
-4. **Siapkan Server**:
-   - Salin proyek ke direktori server web (misalnya, `htdocs` untuk XAMPP).
-   - Pastikan Apache dan MySQL berjalan.
-5. **Akses Aplikasi**:
-   - Buka browser dan kunjungi `http://localhost/Kel8_Penko`.
-
 ## Cara Penggunaan
 
 1. **Akses Aplikasi**:
 
-   - Buka browser dan kunjungi `https://localhost`.
+   - Buka browser dan kunjungi `penko.wuaze.com`.
    - Login menggunakan kredensial admin (default: username `admin`, password `penko123`) atau akun staff (default: username `staff1` atau `staff2`, password `penko123`).
 
 2. **Sebagai Admin**:
@@ -71,12 +52,6 @@ Sistem ini bertujuan menciptakan alur pengajuan dan distribusi ATK yang tertib, 
    - **Cek Status Permintaan**:
      - Buka menu "Status Permintaan" untuk melihat apakah permintaan disetujui, ditolak, atau masih ditinjau.
 
-4. **Tips Penggunaan**:
-
-   - Pastikan login dengan peran yang sesuai (admin/staff).
-   - Periksa stok sebelum mengajukan permintaan (untuk staff).
-   - Admin disarankan memperbarui stok secara berkala untuk menjaga akurasi data.
-   - Gunakan fitur laporan untuk analisis kebutuhan ATK bulanan.
 
 ## Kontributor
 1. [Adrianne Julian Claresta](https://github.com/Idheid)
